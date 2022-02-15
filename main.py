@@ -376,13 +376,10 @@ class TicTacToe:
 
 x = TicTacToe()
 x.ui_manager.mainloop()
-# print(x.get_board_indexes())
 
-# x.setup_ui()
-# x.mainloop()
 
 quit()
-#
+# Text Based Version
 # print('\n')
 #
 # board = [
