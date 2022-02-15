@@ -216,6 +216,7 @@ class TicTacToe:
             print(f"{self.players[self.prvs_player]['name']} Wins!")
 
         print(self.board)
+
         # Rebinds everything
         # self.generate_onclick_functions(True)
 
@@ -230,7 +231,7 @@ class TicTacToe:
         # change_onClick_methods
         else:
             # passes the turtles objects to make move_function so make_move can get then x and y cords
-            # Please Ignore this Mess, i'll change it later
+
             x1 = lambda *_: self.make_move(self.ui_manager.turtles[0], board_indexes[0])  # board_indexes[0])
             x2 = lambda *_: self.make_move(self.ui_manager.turtles[1], board_indexes[1])  # board_indexes[1])
             x3 = lambda *_: self.make_move(self.ui_manager.turtles[2], board_indexes[2])  # board_indexes[2])
@@ -248,9 +249,6 @@ class TicTacToe:
 
         # applies the new Functions
         self.ui_manager.change_onclick_methods(funcs)
-
-    def x(self):
-        self.x()
 
 
     @staticmethod
@@ -313,59 +311,59 @@ class TicTacToe:
             if game_over:
                 break
 
-            # passes the board_row to the are_values_same lambda function above
+            """ passes the board_row to the are_values_clear function above, 
+            which checks in the given list and returns if game is over or not. """
 
             if are_values_clear(board_row):
                 game_over = True
                 winner_symbol = board_row[0]
 
-            # If board_row_ind != 0 or game_over is True then we break
-            if board_row_ind and game_over:
-                game_over = True
-                break
 
-            for row_ind, item in enumerate(board_row):
-                # temporary variables
-                ri = row_ind
-                bri = board_row_ind
+            """ 
+            board_row represents the board list at index n
+            and board_row_ind represennts the index of current nested list inside the board 
+            If board_row_ind == 0 and game_over is False then we loop
+            """
 
-                # Basically Goes Down The List, Gets Their items and Check if they are same
-                x = [self.board[bri][ri], self.board[bri + 1][ri], self.board[bri + 2][ri]]
+            if not board_row_ind and game_over is False:
 
-                print(x)
+                for row_ind, item in enumerate(board_row):
+                    # temporary variables
+                    ri = row_ind
+                    bri = board_row_ind
 
-                if are_values_clear(
-                    # below line basically does this board[bri][ri] == board[bri + 1][ri] == board[bri + 2][ri]
-                    x,
-                    check_in=board_row
-                ):
-                    winner_symbol = self.board[bri][ri]
-                    game_over = True
-
-                """ 
-                if row_ind is 0, Checks Diagonally on The Right
-                if it's 2 checks diagonally on the left 
-                """
-                if row_ind != 1:
-                    ri_index: int = 1
-
-                    if row_ind == 2:
-                        ri_index = -1
-
-                    i = (
-                        self.board[bri][ri],
-                        self.board[bri + 1][ri + 1 * ri_index],
-                        # bri = nested_list: 1, 1
-                        self.board[bri + 2][ri + 2 * ri_index],
-                    )
-
-                    if are_values_clear(i):
-                        winner_symbol = i[0]
+                    if are_values_clear(
+                        # below line basically does this board[bri][ri] == board[bri + 1][ri] == board[bri + 2][ri]
+                        [self.board[bri][ri], self.board[bri + 1][ri], self.board[bri + 2][ri]],
+                        check_in=board_row
+                    ):
+                        winner_symbol = self.board[bri][ri]
                         game_over = True
-                        break
+
+                    """ 
+                    if row_ind is 0, Checks Diagonally on The Right
+                    if it's 2 checks diagonally on the left 
+                    """
+                    if row_ind != 1:
+                        ri_index: int = 1
+
+                        if row_ind == 2:
+                            ri_index = -1
+
+                        i = (
+                            self.board[bri][ri],
+                            self.board[bri + 1][ri + 1 * ri_index],
+                            # bri = nested_list: 1, 1
+                            self.board[bri + 2][ri + 2 * ri_index],
+                        )
+
+                        if are_values_clear(i):
+                            winner_symbol = i[0]
+                            game_over = True
+                            break
 
         if game_over:
-            if winner_symbol == self.players[1]["symbols"]:
+            if winner_symbol == self.players[1]["symbol"]:
                 winner = self.players[1]
             else:
                 winner = self.players[2]
@@ -412,6 +410,7 @@ quit()
 #             winner_symbol = board_row[0]
 #
 #         # If board_row_ind == 0 and game_over is False then we loop
+#
 #         if not board_row_ind and game_over is False:
 #
 #             for row_ind, item in enumerate(board_row):
