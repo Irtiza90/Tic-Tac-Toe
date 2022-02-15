@@ -230,7 +230,7 @@ class TicTacToe:
         # change_onClick_methods
         else:
             # passes the turtles objects to make move_function so make_move can get then x and y cords
-
+            # Please Ignore this Mess, i'll change it later
             x1 = lambda *_: self.make_move(self.ui_manager.turtles[0], board_indexes[0])  # board_indexes[0])
             x2 = lambda *_: self.make_move(self.ui_manager.turtles[1], board_indexes[1])  # board_indexes[1])
             x3 = lambda *_: self.make_move(self.ui_manager.turtles[2], board_indexes[2])  # board_indexes[2])
