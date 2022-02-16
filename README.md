@@ -7,4 +7,4 @@ Tic Tac Toe Made with Python Turtle
 ### Solar System Exploration, 1950s – 1960s
 
 - [x] GUI
-- [] Computer Player
+- Computer Player
