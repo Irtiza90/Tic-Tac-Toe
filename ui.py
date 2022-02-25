@@ -1,7 +1,7 @@
-import turtle
+from turtle import Turtle, Screen
 
 
-class DrawingTurtle(turtle.Turtle):
+class DrawingTurtle(Turtle):
     def __init__(self):
         super().__init__(visible=False)
         self.speed(10)
@@ -51,7 +51,7 @@ class UiManager:
     def __init__(self):
 
         # Setting Up the Screen
-        self.screen = turtle.Screen()
+        self.screen = Screen()
         self.screen.setup(width=652, height=645)
         self.screen.title("Tic Tac Toe")
 
@@ -62,7 +62,7 @@ class UiManager:
 
     @staticmethod
     def create_turtles(
-            turtle_to_clone: turtle.Turtle,
+            turtle_to_clone: Turtle,
             amount_of_copies: int,
             del_original=False
     ):
@@ -86,7 +86,7 @@ class UiManager:
 
     def setup_ui(self):
         # Making The Grid Turtle, That will be cloned
-        grid_t = turtle.Turtle(shape="square")
+        grid_t = Turtle(shape="square")
         grid_t.speed("fastest")
         grid_t.color("white")
         grid_t.penup()
@@ -128,7 +128,7 @@ class UiManager:
         """
         This function will Only be used by the setup_ui function
         """
-        line1 = turtle.Turtle(shape="square", visible=False)
+        line1 = Turtle(shape="square", visible=False)
         line1.penup()
         line1.speed(8)
 
@@ -158,7 +158,7 @@ class UiManager:
             turtle_.forward(650)
 
     
-    def get_turtle_coords(self, turtle_obj: turtle.Turtle) -> tuple[float, float]:
+    def get_turtle_coords(self, turtle_obj: Turtle) -> tuple[float, float]:
         "Returns the x and y coordinates of a Turtle object, as a tuple (x, y)"
         return (turtle_obj.xcor(), turtle_obj.ycor())
     
