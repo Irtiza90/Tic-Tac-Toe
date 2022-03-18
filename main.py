@@ -9,11 +9,7 @@ class TicTacToe:
         self.ui_manager = UiManager()
         self.ui_manager.setup_ui()
 
-        self.board = [
-            ["", "", ""],
-            ["", "", ""],
-            ["", "", ""],
-        ]
+        self.board = ([""] * 3) * 3
 
         self.players = {
             1: {"name": "Player 1", "symbol": "O"},
@@ -104,10 +100,7 @@ class TicTacToe:
         self.ui_manager.mainloop()
 
     def restart_game(self):
-        self.board = [
-            ["" for _ in range(3)]
-            for _ in range(3)
-        ]
+        self.board = ([""] * 3) * 3
 
         # calling The ui Manager's Restart game method
         self.ui_manager.restart_game()
