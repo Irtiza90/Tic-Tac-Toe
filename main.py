@@ -69,28 +69,8 @@ class TicTacToe:
 
         # change_onClick_methods
         # passes the turtles objects to make move_function so make_move can get then x and y cords
-        
-        # These Methods Don't work        
-        # funcs = []
-        # for i in range(9):
-        #     funcs.append(lambda *_: self.make_move(self.ui_manager.turtles[i], board_indexes[i]))
-        
-        # funcs = [
-        #     lambda *_: self.make_move(self.ui_manager.turtles[i], board_indexes[i]) 
-        #     for i in range(9)
-        # ]
-        
-        x1 = lambda *_: self.make_move(self.ui_manager.turtles[0], board_indexes[0])
-        x2 = lambda *_: self.make_move(self.ui_manager.turtles[1], board_indexes[1])
-        x3 = lambda *_: self.make_move(self.ui_manager.turtles[2], board_indexes[2])
-        x4 = lambda *_: self.make_move(self.ui_manager.turtles[3], board_indexes[3])
-        x5 = lambda *_: self.make_move(self.ui_manager.turtles[4], board_indexes[4])
-        x6 = lambda *_: self.make_move(self.ui_manager.turtles[5], board_indexes[5])
-        x7 = lambda *_: self.make_move(self.ui_manager.turtles[6], board_indexes[6])
-        x8 = lambda *_: self.make_move(self.ui_manager.turtles[7], board_indexes[7])
-        x9 = lambda *_: self.make_move(self.ui_manager.turtles[8], board_indexes[8])
 
-        funcs = [x1, x2, x3, x4, x5, x6, x7, x8, x9]
+        funcs = [lambda *_, i=i: self.make_move(self.ui_manager.turtles[i], board_indexes[i]) for i in range(9)]
 
         # applies the new Functions
         self.ui_manager.change_onclick_methods(funcs)
