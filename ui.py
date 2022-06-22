@@ -4,17 +4,16 @@ from turtle import Turtle, Screen
 class DrawingTurtle(Turtle):
     def __init__(self):
         super().__init__(visible=False)
+        self.game_over = False
         self.speed(10)
         self.width(10)
         self.penup()
-
-        self.game_over = False
 
     def reset_pos(self):
         self.penup()
         self.home()
 
-    def draw_circle(self, coordinates: tuple[int | float, int | float]):
+    def draw_circle(self, coordinates: tuple[float, float]):
         if self.game_over:
             return
 
@@ -23,10 +22,9 @@ class DrawingTurtle(Turtle):
         self.setheading(-270)
         self.pendown()
         self.circle(radius=40)
-
         self.reset_pos()
 
-    def draw_cross(self, coordinates: tuple[int | float, int | float]):
+    def draw_cross(self, coordinates: tuple[float, float]):
         if self.game_over:
             return
 
@@ -39,7 +37,7 @@ class DrawingTurtle(Turtle):
             self.pendown()
             self.forward(120)
 
-            if not i:  # if i = 0
+            if i == 0:  # if i = 0
                 self.penup()
                 self.back(60)
                 pos *= 3  # 90 * 3 = 270
@@ -49,7 +47,6 @@ class DrawingTurtle(Turtle):
 
 class UiManager:
     def __init__(self):
-
         # Setting Up the Screen
         self.screen = Screen()
         self.screen.setup(width=652, height=645)
@@ -69,7 +66,7 @@ class UiManager:
         """
         Clones given Turtle in the range of amount of copies required
         coordinates are a tuple that should be given to func
-        Coords are for Turtles positions in which they will move llater on
+        Coords are for Turtles positions in which they will move later on
         del_original Basically deletes Drawings of The original Turtle given
         """
         turtles = []
@@ -85,6 +82,7 @@ class UiManager:
         return turtles
 
     def setup_ui(self):
+        self.screen.tracer(0)
         # Making The Grid Turtle, That will be cloned
         grid_t = Turtle(shape="square")
         grid_t.speed("fastest")
@@ -93,7 +91,6 @@ class UiManager:
         grid_t.shapesize(stretch_wid=10, outline=0)
 
         # Creates all the positions for Grids
-
         for i in range(-1, 2):
             for j in range(-1, 2):
                 index = (j * 220, i * 220 * -1)
@@ -101,14 +98,15 @@ class UiManager:
 
         # cordx, cordy = (0, 0)
 
-        # creates Turtles
+        self.screen.tracer(1)
+        # creating Turtles
         self.turtles = self.create_turtles(grid_t, 9, del_original=True)
 
-        for ind, turtle_ in enumerate(self.turtles):
+        for ind, _turtle in enumerate(self.turtles):
             # Getting the Turtles to their positions
             turtle_goto_pos = self.all_coordinates[ind]
 
-            turtle_.goto(turtle_goto_pos)
+            _turtle.goto(turtle_goto_pos)
             # turtle_.onclick(functions[ind])
 
         # calls the draw_lines function
@@ -157,12 +155,6 @@ class UiManager:
 
             turtle_.forward(650)
 
-    
-    def get_turtle_coords(self, turtle_obj: Turtle) -> tuple[float, float]:
-        "Returns the x and y coordinates of a Turtle object, as a tuple (x, y)"
-        return (turtle_obj.xcor(), turtle_obj.ycor())
-    
-    
     def restart_game(self):
         self.drawing_turtle.game_over = False
         self.drawing_turtle.clear()
@@ -170,5 +162,5 @@ class UiManager:
     def mainloop(self):
         try:
             self.screen.mainloop()
-        except KeyboardInterrupt: 
-            pass
+        except KeyboardInterrupt:
+            return
