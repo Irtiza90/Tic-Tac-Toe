@@ -1,37 +1,42 @@
 from random import randint
 from tkinter import messagebox
-from ui import UiManager
+from functools import partial
+
+from ui import UiManager, Turtle
 
 
 class TicTacToe:
-
     def __init__(self):
         self.ui_manager = UiManager()
         self.ui_manager.setup_ui()
 
-        self.board = [[""] * 3] * 3
+        self.board: list[list[str]] = [["", "", ""] for _ in range(3)]
 
         self.players = {
             1: {"name": "Player 1", "symbol": "O"},
             2: {"name": "Player 2", "symbol": "X"},
         }
-        
+
         # Randomly gives someone a turn
         self.prvs_player = randint(1, 2)
-          
+
         # Setting Up key binds
         self.generate_onclick_functions()
 
-    
-    def make_move(self, turtle_to_move_towards, ind_to_make_move_at: tuple):
-        
+    def make_move(self, *_, turtle_to_move_towards: Turtle, ind_to_make_move_at: tuple) -> None:
+        """
+        Fires a Drawing event and draws a circle/cross(depending on the self.prvs_player)
+
+        :param turtle_to_move_towards: a Turtle object that the drawing will be created at
+        :param ind_to_make_move_at: a tuple object containing the row & col index(in self.board) for the current move
+        :returns: None
+        """
         if self.prvs_player == 2:
             current_player = self.players[1]
         else:
             current_player = self.players[2]
 
-        # coords_to_move_to = (turtle_to_move_towards.xcor(), turtle_to_move_towards.ycor())
-        coords_to_move_to = self.ui_manager.get_turtle_coords(turtle_to_move_towards)
+        coords_to_move_to: tuple[float, float] = turtle_to_move_towards.pos()
 
         # Adds the player_symbol to the board list
         self.board[ind_to_make_move_at[0]][ind_to_make_move_at[1]] = current_player["symbol"]
@@ -45,44 +50,36 @@ class TicTacToe:
             self.ui_manager.drawing_turtle.draw_cross(coords_to_move_to)
             self.prvs_player = 2
 
-        did_game_end = self.did_game_end()
-        
-        if did_game_end["is_game_over"]:
-            
-            winner_name = self.players[self.prvs_player]['name']
+        if self.did_game_end()["is_game_over"]:
             self.ui_manager.drawing_turtle.game_over = True
-            str_to_ask = f"{winner_name} Wins!\nWould You Like To Play Again?"
-            
-            if did_game_end["winner"] == "draw":
-                str_to_ask = "Draw!\nWould You Like To Play Again?"
-            
-            
+            str_to_ask = f"{self.players[self.prvs_player]['name']} Wins!\nWould You Like To Play Again?"
+
             if not messagebox.askyesno(title="Tic Tac Toe", message=str_to_ask):
                 # if user says no we just exit the game
                 quit()
 
             # else
             self.restart_game()
-    
+
     def generate_onclick_functions(self):
         board_indexes = self.get_board_indexes()
-
         # change_onClick_methods
         # passes the turtles objects to make move_function so make_move can get then x and y cords
 
-        funcs = [lambda *_, i=i: self.make_move(self.ui_manager.turtles[i], board_indexes[i]) for i in range(9)]
+        funcs = [
+            partial(
+                self.make_move, turtle_to_move_towards=self.ui_manager.turtles[i], ind_to_make_move_at=board_indexes[i]
+            ) for i in range(9)
+        ]
 
         # applies the new Functions
         self.ui_manager.change_onclick_methods(funcs)
-
 
     def start_game(self):
         self.ui_manager.mainloop()
 
     def restart_game(self):
-        self.board = [[""] * 3] * 3
-
-        # calling The ui Manager's Restart game method
+        self.board: list[list[str]] = [["", "", ""] for _ in range(3)]
         self.ui_manager.restart_game()
 
     def get_board_indexes(self) -> list[tuple]:
@@ -90,7 +87,6 @@ class TicTacToe:
         Gets all The indexes of The Board and returns them as a list
         Like: [(0, 0), (0, 1), (0, 2)...etc]
         """
-
         coords = []
 
         for ind, board_row in enumerate(self.board):
@@ -99,80 +95,56 @@ class TicTacToe:
 
         return coords
 
-    def did_game_end(self) -> dict[str, bool]:
-
-        def are_values_clear(items: list | tuple) -> bool:
+    def did_game_end(self) -> dict[str, bool | str]:
+        def list_is_valid(check_in: list | tuple):
             """
-            items: checks if all of them are same
-            Should be a List, It basically Goes in the list and checks if "" in the list
-            If it does returns False, else Return True (if all values are equal)
+            :param check_in: The list to check items in
+            :returns: True if there's no "" in list, and it's length is 1 else False
             """
+            if "" not in check_in and len(set(check_in)) == 1:
+                # Sets cannot store duplicate elements
+                return True
 
-            if "" in items:
-                return False
+            return False
 
-            """
-            converts the list items to set(a set cannot have duplicate values)
-            and returns if the len of the set is == 1 or not
-            """
-            return len(set(items)) == 1
-
-        winner_symbol = None
+        # --------------
         game_over = False
+        winner, winner_symbol = None, None
 
+        # Example List: [
+        #   [1, 2, 3],
+        #   [4, 5, 6],
+        #   [7, 8, 9],
+        # ]
 
-        for board_row_ind, board_row in enumerate(self.board):
-            if game_over:
-                break
+        # according to example list above
+        # pairs of diagonal_row_1 will be (1, 5, 9)
+        diagonal_row_1 = [self.board[i][i] for i in range(3)]
 
-            # passes all full board row like this ["", "", ""] and checks if they are same
-            if are_values_clear(board_row):
-                """
-                This checks all the nested rows inside the board list
-                These ones : [ 
-                    ["0", "X", ""], Checks from left to right
-                    ["X", "X", ""], on all these nested rows
-                    ["0", "X", ""]
-                ]
-                and goes from left to right and checks if they are same, If they are then game is over
-                """
+        # Pairs of diagonal_row will be (3, 5, 7)
+        diagonal_row_2 = [self.board[0][2], self.board[1][1], self.board[2][0]]
+
+        if list_is_valid(diagonal_row_1):
+            game_over = True
+            winner_symbol = diagonal_row_1[0]
+
+        if list_is_valid(diagonal_row_2):
+            game_over = True
+            winner_symbol = diagonal_row_2[0]
+
+        # Checking downwards
+        # pairs according to above example list will be (1, 4, 7), (2, 5, 8), (3, 6, 9)
+        for row in zip(*self.board):
+            if list_is_valid(row):
+                game_over = True
+                winner_symbol = row[0]
+
+        for board_row in self.board:
+            # Checking Each row from left to right
+            # pairs according to example_list: (1, 2, 3), (4, 5, 6), (7, 8, 9)
+            if list_is_valid(board_row):
                 game_over = True
                 winner_symbol = board_row[0]
-
-
-            if board_row_ind == 0 and game_over is False:
-
-                for row_col_ind in range(len(board_row)):
-                    # row_col ind is the indexes of the nested row(inside the board), That we get from above loop
-
-                    # This Line Goes down the Nested Lists, and checks it with the current row_col_ind
-
-                    if are_values_clear([
-                        self.board[i][row_col_ind] for i in range(3)
-                    ]):
-                        winner_symbol = self.board[board_row_ind][0]
-                        game_over = True
-                        break
-
-                    # --------------- Diagonal Checking  ---------------------------- #
-                    """
-                    if row_ind is 0, Checks Diagonally on The Right
-                    if it's 2 checks diagonally on the left
-                    """
-
-                    if row_col_ind != 1:
-                        multiply_by = 1
-
-                        if row_col_ind == 2:
-                            multiply_by = -1
-
-                        if are_values_clear(
-                                [self.board[i][row_col_ind + (i * multiply_by)] for i in range(3)]
-                        ):
-                            winner_symbol = self.board[board_row_ind][row_col_ind]
-                            game_over = True
-                            break
-
 
         if game_over:
             if winner_symbol == self.players[1]["symbol"]:
@@ -182,21 +154,14 @@ class TicTacToe:
 
         else:
             winner = None
-            # Checks if all of the board is filled, But no one wins
-            li = []
 
-            for row in self.board:
-                for item in row:
-                    li.append(item)
-            
-            if "" not in li:
+            # Checks if all the board is filled, But no one wins
+            if not any("" in row for row in self.board):
                 game_over = True
                 winner = "draw"
-
 
         return {"is_game_over": game_over, "winner": winner}
 
 
-
-game = TicTacToe()
-game.start_game()
+if __name__ == "__main__":
+    TicTacToe().start_game()
